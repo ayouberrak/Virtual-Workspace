@@ -1,4 +1,3 @@
-
 let btnAdd = document.getElementById('btn-add');
 let formulaire = document.getElementById('model-form');
 let cancelBtn = document.getElementById('cancel-btn');
@@ -6,23 +5,8 @@ let photoInput = document.getElementById('Photo');
 let photoPreview = document.getElementById('photoPreview');
 let btnAddExpriances = document.getElementById('btn-Add-Expriances');
 let exeperiancesContairer = document.getElementById('experiances-contairer');
-let nextSilblingExperiances = document.getElementById('nextSilblingExperiances');
 let form = document.getElementById('formulaire');
 let workersContainer = document.getElementById('workers-container');
-
-let reception = document.getElementById('reception');
-let serveurs = document.getElementById('salle-serveurs');
-let securite = document.getElementById('salle-securite');
-let personnel = document.getElementById('salle-personnel');
-let archives = document.getElementById('salle-darchives');
-let conference = document.getElementById('salle-conference');
-
-let btnreception = document.getElementById('btn-reception');
-let btnserveurs = document.getElementById('btn-salle-serveurs');
-let btnsecurite = document.getElementById('btn-salle-securite');
-let btnpersonnel = document.getElementById('btn-salle-personnel');
-let btnarchives = document.getElementById('btn-salle-darchives');
-let btnconference = document.getElementById('btn-salle-conference '); 
 
 const modalContainer = document.getElementById('modal-container');
 const modalTitle = document.getElementById('modal-title');
@@ -30,6 +14,19 @@ const employeesList = document.getElementById('authorized-employees-list');
 const noRoleMessage = document.getElementById('no-role-message');
 const closeModalBtn = document.getElementById('close-modal-btn');
 
+const containerReception = document.getElementById('container-reception');
+const containerServeurs = document.getElementById('container-serveurs');
+const containerSecurite = document.getElementById('container-securite');
+const containerPersonnel = document.getElementById('container-personnel');
+const containerArchives = document.getElementById('container-archives');
+const containerConference = document.getElementById('container-conference');
+
+const btnreception = document.getElementById('btn-reception');
+const btnserveurs = document.getElementById('btn-salle-serveurs');
+const btnsecurite = document.getElementById('btn-salle-securite');
+const btnpersonnel = document.getElementById('btn-salle-personnel');
+const btnarchives = document.getElementById('btn-salle-darchives');
+const btnconference = document.getElementById('btn-salle-conference');
 
 let roleInReceprion = ["Réceptionnistes", "Manager", "Nettoyage"];
 let roleInServeurs = ["Techniciens IT", "Manager", "Nettoyage"];
@@ -39,349 +36,298 @@ let roleInArchives = ["Manager"];
 let roleInConference = ["Agents de sécurité", "Manager", "Nettoyage", "Autres rôles", "Techniciens IT", "Receptionnistes"];
 
 
-
-function closeModel() {
-    formulaire.classList.add('hidden');
-}
-
-// cancel model 
-cancelBtn.addEventListener('click', () => {
-    closeModel();
-});
-
-// afficher model
 btnAdd.addEventListener('click', () => {
-    formulaire.classList.toggle('hidden');
+    formulaire.classList.remove('hidden')
+});
+cancelBtn.addEventListener('click', () => {
+    formulaire.classList.add('hidden')
+});
+closeModalBtn.addEventListener('click', () => {
+    modalContainer.style.display = 'none'
 });
 
-// close model when click outside form
-formulaire.addEventListener('click', (e) => {
-    if (e.target === formulaire) {
-        closeModel();
-    }
-
-});
-
-// photo preview !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 photoInput.addEventListener('input', (e) => {
-    let url = e.target.value;
     photoPreview.innerHTML = '';
 
     let img = document.createElement('img');
-    img.src = url;
     img.className = 'w-full h-full object-cover rounded-full';
 
     img.onerror = () => {
         img.src = './public/images/default-Photo.jpg';
     };
 
+    img.src = e.target.value;
+
     photoPreview.appendChild(img);
 });
 
-// add experiances
-btnAddExpriances.addEventListener('click', () => {
-    let container = document.createElement('div');
-    container.className = 'mt-4';
-    container.innerHTML = `
-        <div class="mb-2 flex gap-2 items-center">
-            <div class='w-[30rem]'>
-                <label for="Entreprise" class="block mb-2 text-sm font-medium text-slate-200">Entreprise</label>
-                <input type="text" name="Entreprise"
-                    class="w-full px-4 py-3 text-gray-100 transition-all duration-200 ease-in-out bg-slate-700 border-0 rounded-lg outline-none focus:bg-slate-600 focus:ring-2 focus:ring-green-500">
-            </div>
-            <i class="fa-solid fa-trash-can text-red-600 hover:text-red-800 cursor-pointer mt-6 text-4xl"></i>
-        </div>
-        <div class="mb-2 flex gap-2 items-center">
-            <div>
-                <label for="DateFrom" class="block mb-2 text-sm font-medium text-slate-200">From</label>
-                <input type="date" name="DateFrom"
-                    class="w-full px-4 py-3 text-gray-100 transition-all duration-200 ease-in-out bg-slate-700 border-0 rounded-lg outline-none focus:bg-slate-600 focus:ring-2 focus:ring-green-500">
-            </div>
-            <div>
-                <label for="DateTo" class="block mb-2 text-sm font-medium text-slate-200">To</label>
-                <input type="date" name="DateTo"
-                    class="w-full px-4 py-3 text-gray-100 transition-all duration-200 ease-in-out bg-slate-700 border-0 rounded-lg outline-none focus:bg-slate-600 focus:ring-2 focus:ring-green-500">
-            </div>
-        </div>
-    `;
-    exeperiancesContairer.insertBefore(container, nextSilblingExperiances.nextSibling);
-});
-// delete experiances
-exeperiancesContairer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('fa-trash-can')) {
-        let experiancesDiv = e.target.closest('div.mt-4');
-        if (experiancesDiv) {
-            exeperiancesContairer.removeChild(experiancesDiv);
-        }
-    }
-});
 
-
-let worker;
-// fuction de add woker
 form.addEventListener('submit', function (e) {
     e.preventDefault();
+
     let name = document.getElementById('name').value;
     let position = document.getElementById('role').value;
     let image = document.getElementById('Photo').value;
+    if (!image) image = './public/images/default-Photo.jpg';
+
     let email = document.getElementById('email').value;
     let phone = document.getElementById('phone').value;
 
-
-    if (!image) {
-        image = './public/images/default-Photo.jpg';
-    }
-    image.onerror = () =>{
-        image.value = './public/images/default-Photo.jpg'
-    }
-
-
-    // recuperer les exeprience
     let experiences = [];
-    let experienceInputs = exeperiancesContairer.querySelectorAll('div.mt-4');
-    experienceInputs.forEach(exp => {
-        let entreprise = exp.querySelector('input[name="Entreprise"]').value;
-        let dateFrom = exp.querySelector('input[name="DateFrom"]').value;
-        let dateTo = exp.querySelector('input[name="DateTo"]').value;
+    document.querySelectorAll('#experiances-contairer .mt-4').forEach(div => {
+        let ent = div.querySelector('input[name="Entreprise"]').value;
+        let dFrom = div.querySelector('input[name="DateFrom"]').value;
+        let dTo = div.querySelector('input[name="DateTo"]').value;
 
-        if (entreprise || dateFrom || dateTo) {
+        if (ent && dFrom && dTo) {
             experiences.push({
-                entreprise: entreprise,
-                dateFrom: dateFrom,
-                dateTo: dateTo
+                entreprise: ent,
+                dateFrom: dFrom,
+                dateTo: dTo
             });
         }
     });
-    function getId(){
-        return  Date.now();
-    }
 
-    worker = {
-        id:getId(),
+    let worker = {
+        id: Date.now(),
         fullname: name,
         role: position,
         photo: image,
-        email,
-        phone,
-        experiences
+        email: email,
+        phone: phone,
+        experiences: experiences,
+        zonesAsigned: null
     };
-    console.log(worker.id)
-    console.log(worker.experiences)
-    afficherWorker(worker);
+
+    let employes = JSON.parse(localStorage.getItem('employe')) || [];
+    employes.push(worker);
+    localStorage.setItem('employe', JSON.stringify(employes));
+
     form.reset();
-    photoPreview.innerHTML = ` <img src="./public/images/default-Photo.jpg" alt="default-Photo" class="w-24 h-24 rounded-full object-cover">`
-    closeModel();
+    photoPreview.innerHTML = ''; // Nms7o preview
+    formulaire.classList.add('hidden');
+
+    refreshUI();
 });
-// aficher function
-function afficherWorker(newWorker = null) {
-    let employe = JSON.parse(localStorage.getItem('employe')) || [];
-    if (newWorker) {
-        employe.push(newWorker);
-        localStorage.setItem('employe', JSON.stringify(employe));
-    }
-    workersContainer.innerHTML = "";
-    employe.forEach(item => {
-        if (!item) return;
 
-        let card = document.createElement('div');
-        card.className = "cursor-pointer mt-4 min-w-0 max-w-full p-4 bg-black rounded-lg mb-2 text-center text-white flex justify-start items-center gap-6 ";
-        card.innerHTML = `
-            <div class="w-16 h-16 worker cursor-pointer">
-                <img src="${item.photo}" class="w-full h-full object-cover rounded-full" onerror="this.src='./public/images/default-Photo.jpg'">
-            </div>
-            <div>
-                <h4 class="text-lg font-semibold">${item.fullname}</h4>
-                <p class="text-slate-300">${item.role}</p>
-            </div>
-            <button class="text-white hover:text-black cursor-pointer">Edit</button>
-        `;
-        card.addEventListener('click', () => {
-            afichierInfoWorker(item)
-        });
-        workersContainer.appendChild(card);
-    });
-
-
-}
-
-function afichierInfoWorker(newwoker) {
-
-
-
-    let divInfo = document.createElement('div');
-    divInfo.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'
-    divInfo.innerHTML = `
-        <div class="bg-black/90 rounded-2xl w-[25rem] overflow-hidden relative h-auto">
-
-            <div class="px-6 pb-6">
-                <div class="flex gap-8 items-center">
-                    <img src="${newwoker.photo}"
-                        class="w-[7rem] h-[7rem] rounded-full border-4 object-cover mt-6 ">
-                    <div>
-                        <h2 class="text-2xl font-extrabold text-white mt-6">${newwoker.fullname}</h2>
-                        <span class=" text-green-400 text-sm ">${newwoker.role}</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-16 my-4 text-sm text-slate-200">
-                    <div class=" p-2 rounded">
-                        <p class="text-slate-400 text-xs">EMAIL</p>${newwoker.email}
-                    </div>
-                    <div class=" p-2 rounded">
-                        <p class="text-slate-400 text-xs">TEL</p>${newwoker.phone}
-                    </div>
-                </div>
-
-                <h3 class="text-white font-bold mb-2 h-8 border-b  border-slate-600 ">Expériences</h3>
-                <ol class="relative max-h-[13rem] overflow-y-auto pr-2 no-scrollbar list">
-                    
-                </ol>
-
-
-            </div>
+btnAddExpriances.addEventListener('click', () => {
+    let div = document.createElement('div');
+    div.className = 'mt-4';
+    div.innerHTML = `
+        <div class="mb-2 flex gap-2 items-center">
+            <div class='w-[30rem]'><input type="text" name="Entreprise" placeholder="Entreprise" class="w-full px-4 py-3 bg-slate-700 text-white rounded-lg focus:ring-2 focus:ring-green-500 outline-none"></div>
+            <i class="fa-solid fa-trash-can text-red-600 cursor-pointer text-2xl delete-exp hover:text-red-400"></i>
         </div>
+        <div class="flex gap-2">
+            <input type="date" name="DateFrom" class="w-full px-4 py-3 bg-slate-700 text-white rounded-lg outline-none">
+            <input type="date" name="DateTo" class="w-full px-4 py-3 bg-slate-700 text-white rounded-lg outline-none">
+        </div>
+    `;
+    div.querySelector('.delete-exp').addEventListener('click', () => div.remove());
+    exeperiancesContairer.appendChild(div);
+});
 
-    `
-    document.body.appendChild(divInfo);
-    newwoker.experiences.forEach(e => {
-        let listExpeirances = divInfo.querySelector('.list');
-        let list = document.createElement('li')
-        list.className = "mb-4 ml-4"
-        list.innerHTML = `
-                        <time class="text-sm text-slate-400">${e.dateFrom} - ${e.dateTo}</time>
-                        <h3 class="text-lg font-semibold text-white">${e.entreprise}</h3>
-        `
-        listExpeirances.appendChild(list)
 
-    })
+function refreshUI() {
+    workersContainer.innerHTML = "";
+    containerReception.innerHTML = "";
+    containerServeurs.innerHTML = "";
+    containerSecurite.innerHTML = "";
+    containerPersonnel.innerHTML = "";
+    containerArchives.innerHTML = "";
+    containerConference.innerHTML = "";
 
-    divInfo.addEventListener('click', e => {
-        e.target === divInfo && divInfo.remove()
+    let employes = JSON.parse(localStorage.getItem('employe')) || [];
+
+    employes.forEach(emp => {
+        if (emp.zonesAsigned === null) {
+            createSidebarCard(emp);
+        } else {
+            createZoneCard(emp);
+        }
     });
-
-
-    
 }
 
+function createSidebarCard(emp) {
+    let card = document.createElement('div');
+    card.className = "cursor-pointer mt-4 p-4 bg-gray-300 rounded-lg text-white flex items-center gap-4 border border-transparent hover:border-green-500 transition-all p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800";
+    card.innerHTML = `
+        <img src="${emp.photo}" class="w-10 h-10 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
+            <div>
+                <p class="text-white font-bold text-sm">${emp.fullname}</p>
+                <p class="text-gray-400 text-xs">${emp.role}</p>
+            </div>
+    `;
+    card.addEventListener('click', () => afichierInfoWorker(emp));
+    workersContainer.appendChild(card);
+}
+
+function createZoneCard(emp) {
+    let card = document.createElement('div');
+    card.className = "relative cursor-pointer";
+
+    card.innerHTML = `
+        <div class="relative flex items-center gap-2 px-4 py-2 bg-gray-200 rounded-lg max-w-[15rem] ">
+            <img src="${emp.photo}" 
+                 class="h-14 w-14 rounded-full object-cover border-4 "
+                 onerror="this.src='./public/images/default-Photo.jpg'">
+
+            <div class ='relative'>
+                <h3 class="text-sm font-bold text-gray-800 mb-[15%] mb-[15%]">${emp.fullname}</h3>
+                <h3 class="text-[0.7rem] font-sm text-gray-800 absolute top-[50%] ">${emp.role}</h3>
+            </div>
 
 
+            <button class="delete-btn w-5 h-5 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-trash-can text-red-600 cursor-pointer text-2xl delete-exp hover:text-red-400"></i>
+            </button>
+        </div>
+    `;
 
-function EvnentListerForZone(btnToClick, ArrayRole, zoneName) {
-    btnToClick.addEventListener('click', () => {
-        
-        employeesList.innerHTML = '';
-        modalTitle.textContent = `Employés Autorisés pour : ${zoneName}`;
+    // AJOUT DE L'EVENT LISTENER POUR AFFICHER LES INFOS
+    card.addEventListener('click', () => afichierInfoWorker(emp));
+
+    card.querySelector('.delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        updateEmployeeZone(emp.id, null);
+    });
+
+    if (emp.zonesAsigned === "Réception") {
+        containerReception.appendChild(card);
+    }
+    else if (emp.zonesAsigned === "Salle Serveurs") {
+        containerServeurs.appendChild(card)
+    }
+    else if (emp.zonesAsigned === "Salle Sécurité") containerSecurite.appendChild(card);
+    else if (emp.zonesAsigned === "Salle Personnel") containerPersonnel.appendChild(card);
+    else if (emp.zonesAsigned === "Salle d'Archives") containerArchives.appendChild(card);
+    else if (emp.zonesAsigned === "Salle de Conférence") containerConference.appendChild(card);
+}
+
+function updateEmployeeZone(id, newZone) {
+    let employes = JSON.parse(localStorage.getItem('employe')) || [];
+    for (let i = 0; i < employes.length; i++) {
+        if (employes[i].id === id) {
+            employes[i].zonesAsigned = newZone;
+            break;
+        }
+    }
+    localStorage.setItem('employe', JSON.stringify(employes));
+    refreshUI();
+}
+
+function setupZoneButton(btn, rolesAllowed, zoneName) {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modalContainer.style.display = 'flex';
+        modalTitle.innerText = "Ajouter à : " + zoneName;
+        employeesList.innerHTML = "";
         noRoleMessage.style.display = 'none';
 
-        let employe = JSON.parse(localStorage.getItem('employe')) || [];
-        let authorizedEmployeesFound = false;
+        let employes = JSON.parse(localStorage.getItem('employe')) || [];
+        let found = false;
 
-        employe.forEach(items => {
-            if (ArrayRole.includes(items.role)) {
-                authorizedEmployeesFound = true;
-
-                let cardInZone = document.createElement('div');
-                
-                cardInZone.classList.add(
-                    'border','border-gray-300','p-3','mb-3','flex','items-center',  'rounded-lg','shadow-sm',     'bg-white'
-                );
-
-                cardInZone.innerHTML = `
-                    <img src='${items.photo}' alt='${items.fullname}' 
-                        class='w-12 h-12 rounded-full mr-4 object-cover' 
-                    >
+        employes.forEach(emp => {
+            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned === null) {
+                found = true;
+                let div = document.createElement('div');
+                div.className = "flex items-center gap-3 p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800";
+                div.innerHTML = `
+                    <img src="${emp.photo}" class="w-10 h-10 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
                     <div>
-                        <p class='m-0 font-semibold text-gray-800'>${items.fullname}</p>
-                        <p class='m-0 text-sm text-gray-500'>${items.role}</p>
+                        <p class="text-white font-bold text-sm">${emp.fullname}</p>
+                        <p class="text-gray-400 text-xs">${emp.role}</p>
                     </div>
                 `;
-                employeesList.appendChild(cardInZone);
+                div.addEventListener('click', () => {
+                    updateEmployeeZone(emp.id, zoneName);
+                    modalContainer.style.display = 'none';
+                });
+                employeesList.appendChild(div);
             }
         });
 
-        if (!authorizedEmployeesFound) {
-            noRoleMessage.style.display = 'block';
-        }
-        modalContainer.style.display = 'flex';
+        if (!found) noRoleMessage.style.display = 'block';
     });
 }
 
+setupZoneButton(btnreception, roleInReceprion, "Réception");
+setupZoneButton(btnserveurs, roleInServeurs, "Salle Serveurs");
+setupZoneButton(btnsecurite, roleInSecurite, "Salle Sécurité");
+setupZoneButton(btnpersonnel, roleInPersonnel, "Salle Personnel");
+setupZoneButton(btnarchives, roleInArchives, "Salle d'Archives");
+setupZoneButton(btnconference, roleInConference, "Salle de Conférence");
 
-EvnentListerForZone(btnreception, roleInReceprion, "Réception");
-EvnentListerForZone(btnserveurs, roleInServeurs, "Salle Serveurs");
-EvnentListerForZone(btnsecurite, roleInSecurite, "Salle Sécurité");
-EvnentListerForZone(btnpersonnel, roleInPersonnel, "Salle Personnel");
-EvnentListerForZone(btnarchives, roleInArchives, "Salle d'Archives");
-EvnentListerForZone(btnconference, roleInConference, "Salle de Conférence");
 
-closeModalBtn.addEventListener('click', () => {
-    modalContainer.style.display = 'none';
-});
+function afichierInfoWorker(newwoker) {
+    let divInfo = document.createElement('div');
+    divInfo.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4';
+    
+    // Contenu HTML de base de la modale
+    let modalContent = `
+        <div class="bg-black/90 rounded-2xl w-[25rem] p-6 relative text-white border border-gray-700 shadow-2xl ">
+            <div class="flex gap-4 items-center mb-6">
+                <img src="${newwoker.photo}" class="w-24 h-24 rounded-full border-4 border-green-500 object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
+                <div>
+                    <h2 class="text-2xl font-bold">${newwoker.fullname}</h2>
+                    <p class="text-green-400 font-semibold">${newwoker.role}</p>
+                </div>
+            </div>
+            
+            <div id="contact-info" class="mb-6 bg-gray-800 p-3 rounded-lg">
+                <p class="mb-1"><span class="text-gray-400 text-xs">EMAIL:</span> ${newwoker.email}</p>
+                <p><span class="text-gray-400 text-xs">TEL:</span> ${newwoker.phone}</p>
+            </div>
+            
+            <h3 class="border-b border-gray-600 mb-3 pb-1 font-bold text-lg">Expériences</h3>
+            <ul id="exp-list" class="max-h-40 overflow-y-auto pr-2 no-scrollbar">
+            </ul>
+        </div>
+    `;
 
-modalContainer.addEventListener('click', (e) => {
-    if (e.target.id === 'modal-container') {
-        modalContainer.style.display = 'none';
+    divInfo.innerHTML = modalContent;
+    
+    // Sélecteurs pour les éléments internes
+    let modalBody = divInfo.querySelector('.bg-black\\/90');
+    let ul = divInfo.querySelector('#exp-list');
+    let contactInfoDiv = divInfo.querySelector('#contact-info');
+
+    // --- Ajout Conditionnel de la Zone Assignée ---
+    
+    if (newwoker.zonesAsigned) {
+        let divZone = document.createElement('div');
+        divZone.className = 'mb-6 bg-green-900/40 p-3 rounded-lg border border-green-700';
+        divZone.innerHTML = `
+            <p><span class="text-green-400 text-xs">ZONE ASSIGNÉE:</span> <span class="font-bold text-lg block">${newwoker.zonesAsigned}</span></p>
+        `;
+        // Insérer la zone juste après les informations de contact
+        contactInfoDiv.after(divZone);
     }
-});
+    
+    // --- Traitement des Expériences ---
+    
+    if (newwoker.experiences && newwoker.experiences.length > 0) {
+        newwoker.experiences.forEach(e => {
+            let li = document.createElement('li');
+            li.className = "mb-3 p-2 bg-gray-800/50 rounded border-l-4 border-green-500";
+            li.innerHTML = `
+                <div class="text-sm text-gray-400 mb-1">${e.dateFrom} <span class="mx-1">→</span> ${e.dateTo}</div>
+                <div class="font-bold text-white uppercase">${e.entreprise}</div>
+            `;
+            ul.appendChild(li);
+        });
+    } else {
+        ul.innerHTML = `<li class="text-gray-500 italic text-sm">Aucune expérience enregistrée.</li>`;
+    }
 
-// function EvnentListerForZone(idToClick, ArrayRole) {
-//     idToClick.addEventListener('click', () => {
-//         // 1. Clear previous content in the clicked zone (optional)
-//         idToClick.innerHTML = ''; 
-        
-//         // 2. Retrieve employee data
-//         let employe = JSON.parse(localStorage.getItem('employe')) || [];
-//         let authorizedEmployeesFound = false;
+    // --- Gestion de la Fermeture de la Modale ---
+    
+    divInfo.addEventListener('click', (e) => { 
+        // Ferme la modale uniquement si on clique sur l'arrière-plan (l'élément divInfo lui-même)
+        if (e.target === divInfo) divInfo.remove(); 
+    });
+    
+    document.body.appendChild(divInfo);
+}
 
-//         employe.forEach(items => {
-//             if (ArrayRole.includes(items.role)) {
-//                 authorizedEmployeesFound = true; 
-                
-//                 let cardInZone = document.createElement('div');
-//                 cardInZone.classList.add('employee-card'); 
-                
-//                 cardInZone.innerHTML = `
-//                     <img src='${items.photo}' alt='${items.name}' class='employee-photo'>
-//                     <p class='employee-name'>${items.name}</p>
-//                     <p class='employee-role'>${items.role}</p>
-//                 `;
-                
-//                 idToClick.appendChild(cardInZone);
-//             }
-//         });
-
-//         if (!authorizedEmployeesFound) {
-//             let noRoleMessage = document.createElement('p');
-//             noRoleMessage.textContent = "Il n'y a aucun employé autorisé ici.";
-//             idToClick.appendChild(noRoleMessage);
-//         }
-//     });
-// }
-
-
-
-
-
-
-
-
-afficherWorker();
-
-
-
-
-// // locale storage
-// function addtolocalestorage(employes) {
-//     let employe = JSON.parse(localStorage.getItem('employe')) || [];
-//     employe.push(employes);
-//     localStorage.setItem('employe', JSON.stringify(employe));
-// }
-
-
-// // // fuction de aficher les information
-// // let information = document.createElement('div');
-// console.log(window.innerWidth)
-// console.log(window.innerHeight)
-// while(window.innerWidth < window.innerHeight){
-//     alert('wertyui')
-// }
+refreshUI();
