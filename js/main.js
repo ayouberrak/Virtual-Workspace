@@ -231,14 +231,19 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
             if (rolesAllowed.includes(emp.role) && emp.zonesAsigned === null) {
                 found = true;
                 let div = document.createElement('div');
-                div.className = "flex items-center gap-3 p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800";
+                div.className = "flex items-center gap-3 p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800 max-sm:flex-col max-sm:items-start";
+
                 div.innerHTML = `
-                    <img src="${emp.photo}" class="w-10 h-10 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
-                    <div>
-                        <p class="text-white font-bold text-sm">${emp.fullname}</p>
-                        <p class="text-gray-400 text-xs">${emp.role}</p>
+                    <img src="${emp.photo}" 
+                        class="w-10 h-10 rounded-full object-cover max-sm:w-12 max-sm:h-12"
+                        onerror="this.src='./public/images/default-Photo.jpg'">
+
+                    <div class="max-sm:mt-1">
+                        <p class="text-white font-bold text-sm max-sm:text-base">${emp.fullname}</p>
+                        <p class="text-gray-400 text-xs max-sm:text-sm">${emp.role}</p>
                     </div>
-                `;
+                `;  
+
                 div.addEventListener('click', () => {
                     updateEmployeeZone(emp.id, zoneName);
                     modalContainer.style.display = 'none';
@@ -262,8 +267,7 @@ setupZoneButton(btnconference, roleInConference, "Salle de Conférence");
 function afichierInfoWorker(newwoker) {
     let divInfo = document.createElement('div');
     divInfo.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4';
-    
-    // Contenu HTML de base de la modale
+
     let modalContent = `
         <div class="bg-black/90 rounded-2xl w-[25rem] p-6 relative text-white border border-gray-700 shadow-2xl ">
             <div class="flex gap-4 items-center mb-6">
@@ -286,26 +290,21 @@ function afichierInfoWorker(newwoker) {
     `;
 
     divInfo.innerHTML = modalContent;
-    
-    // Sélecteurs pour les éléments internes
+
     let modalBody = divInfo.querySelector('.bg-black\\/90');
     let ul = divInfo.querySelector('#exp-list');
     let contactInfoDiv = divInfo.querySelector('#contact-info');
 
-    // --- Ajout Conditionnel de la Zone Assignée ---
-    
+
     if (newwoker.zonesAsigned) {
         let divZone = document.createElement('div');
         divZone.className = 'mb-6 bg-green-900/40 p-3 rounded-lg border border-green-700';
         divZone.innerHTML = `
             <p><span class="text-green-400 text-xs">ZONE ASSIGNÉE:</span> <span class="font-bold text-lg block">${newwoker.zonesAsigned}</span></p>
         `;
-        // Insérer la zone juste après les informations de contact
         contactInfoDiv.after(divZone);
     }
-    
-    // --- Traitement des Expériences ---
-    
+
     if (newwoker.experiences && newwoker.experiences.length > 0) {
         newwoker.experiences.forEach(e => {
             let li = document.createElement('li');
@@ -320,13 +319,11 @@ function afichierInfoWorker(newwoker) {
         ul.innerHTML = `<li class="text-gray-500 italic text-sm">Aucune expérience enregistrée.</li>`;
     }
 
-    // --- Gestion de la Fermeture de la Modale ---
-    
-    divInfo.addEventListener('click', (e) => { 
-        // Ferme la modale uniquement si on clique sur l'arrière-plan (l'élément divInfo lui-même)
-        if (e.target === divInfo) divInfo.remove(); 
+
+    divInfo.addEventListener('click', (e) => {
+        if (e.target === divInfo) divInfo.remove();
     });
-    
+
     document.body.appendChild(divInfo);
 }
 
