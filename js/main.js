@@ -1,3 +1,4 @@
+// variables globale 
 let btnAdd = document.getElementById('btn-add');
 let formulaire = document.getElementById('model-form');
 let cancelBtn = document.getElementById('cancel-btn');
