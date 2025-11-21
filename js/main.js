@@ -42,11 +42,11 @@ let roleInPersonnel = ["Agents de securite", "Manager", "Nettoyage", "Autres rol
 let roleInArchives = ["Manager"];
 let roleInConference = ["Agents de securite", "Manager", "Nettoyage", "Autres roles", "Techniciens IT", "Receptionnistes"];
 
-
+///// alert for the timer ////
 function showTempAlert(message, duration = 3000) {
-    if (tempAlert.timeout) {
-        clearTimeout(tempAlert.timeout);
-    }
+        if (tempAlert.timeout) {
+            clearTimeout(tempAlert.timeout);
+        }
 
     tempAlert.innerText = message;
     tempAlert.classList.remove('hidden');
@@ -59,7 +59,7 @@ function showTempAlert(message, duration = 3000) {
         }, 300);
     }, duration);
 }
-
+//////// for colse and open form /////
 btnAdd.addEventListener('click', () => {
     formulaire.classList.remove('hidden');
 });
@@ -71,7 +71,7 @@ cancelBtn.addEventListener('click', () => {
 closeModalBtn.addEventListener('click', () => {
     modalContainer.style.display = 'none';
 });
-
+/////// photo preview ///////
 photoInput.addEventListener('input', (e) => {
     photoPreview.innerHTML = '';
     let img = document.createElement('img');
@@ -83,12 +83,13 @@ photoInput.addEventListener('input', (e) => {
     photoPreview.appendChild(img);
 });
 
+//// serach call /////
 if (searchInput && filterSelect) {
     searchInput.addEventListener('input', () => refreshUI());
     filterSelect.addEventListener('change', () => refreshUI());
 }
 
-
+///error validation //
 function displayError(inputElement, message, condition) {
     const previousError = inputElement.nextElementSibling;
     if (previousError && previousError.classList.contains('error-message')) {
@@ -113,6 +114,7 @@ function displayError(inputElement, message, condition) {
 form.addEventListener('submit', function (e) {
     e.preventDefault();
 
+    //// rejex validation ////
     const nameRegEx = /^[a-zA-Z\s\u00C0-\u00FF'-]{2,}$/;
     const emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const phoneRegEx = /^\+?(\d[\d\s-]{8,}\d)$/;
@@ -122,13 +124,14 @@ form.addEventListener('submit', function (e) {
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
 
-    const isNameValid = displayError(nameInput, ' Nom invalide. (Minimum 2 caracteres)', nameRegEx.test(nameInput.value));
-    const isEmailValid = displayError(emailInput, ' Format d\'email invalide (ex: utilisateur@domaine.com)', emailRegEx.test(emailInput.value));
+    const isNameValid = displayError(nameInput, ' Minimum 2 caracteres', nameRegEx.test(nameInput.value));
+    const isEmailValid = displayError(emailInput, ' Format d email invalide', emailRegEx.test(emailInput.value));
     const isPhoneValid = displayError(phoneInput, ' Numero de telephone invalide.', phoneRegEx.test(phoneInput.value));
 
     let isExperienceValid = true;
     let experiences = [];
 
+    ///// entreprise validation ////
     document.querySelectorAll('#experiances-contairer > div').forEach(div => {
         let entInput = div.querySelector('input[name="Entreprise"]');
         let dFrom = div.querySelector('input[name="DateFrom"]').value;
@@ -136,7 +139,7 @@ form.addEventListener('submit', function (e) {
         let ent = entInput.value;
 
         if (ent && !entrepriseRegEx.test(ent)) {
-            displayError(entInput, ' Nom de l\'entreprise invalide.', entrepriseRegEx.test(ent));
+            displayError(entInput, ' Nom de l entreprise invalide.', entrepriseRegEx.test(ent));
             isExperienceValid = false;
         } else if (ent) {
             displayError(entInput, '', true);
@@ -147,16 +150,17 @@ form.addEventListener('submit', function (e) {
         }
     });
 
-    // Arrete la soumission si une validation echoue
     if (!(isNameValid && isEmailValid && isPhoneValid && isExperienceValid)) {
         return;
     }
 
-    // Collecte des donnees du nouvel employe
+    //// stoker les info de worker
     let name = nameInput.value;
     let position = document.getElementById('role').value;
     let image = document.getElementById('Photo').value;
-    if (!image) image = './public/images/default-Photo.jpg';
+    if (!image){
+         image = './public/images/default-Photo.jpg'
+    };
 
     let email = emailInput.value;
     let phone = phoneInput.value;
@@ -169,24 +173,25 @@ form.addEventListener('submit', function (e) {
         email: email,
         phone: phone,
         experiences: experiences,
-        zonesAsigned: null // Initialisation sans zone
+        zonesAsigned: null 
     };
 
-    // Sauvegarde dans localStorage
+    //// localStorage//
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
     employes.push(worker);
     localStorage.setItem('employe', JSON.stringify(employes));
 
-    // Reinitialisation du formulaire et fermeture du modal
+    //// reset formulaire et fermeture du modal////
     form.reset();
     photoPreview.innerHTML = `<img src="./public/images/default-Photo.jpg" alt="default-Photo" class="w-full h-full object-cover">`;
-    experiencesContainer.innerHTML = ''; // Nettoyer les champs d'experience
+    experiencesContainer.innerHTML = '';
 
     formulaire.classList.add('hidden');
     showTempAlert('Employe Ajoute avec Succes!');
-    refreshUI(); // Mise a jour de l'interface utilisateur
+    refreshUI();
 });
 
+////// experinace add ////
 btnAddExperiences.addEventListener('click', () => {
     let div = document.createElement('div');
     div.className = 'mt-4 p-2 rounded-lg bg-gray-50';
@@ -205,7 +210,7 @@ btnAddExperiences.addEventListener('click', () => {
     div.querySelector('.delete-exp').addEventListener('click', () => div.remove());
     experiencesContainer.appendChild(div);
 });
-
+// ///// afichage des card dans les zones //////
 function refreshUI() {
     workersContainer.innerHTML = "";
     containerReception.innerHTML = "";
@@ -233,7 +238,7 @@ function refreshUI() {
     });
 }
 
-
+// /// afichager des card dans sidbar ////
 function createSidebarCard(emp) {
     let card = document.createElement('div');
     card.className = "cursor-pointer p-2 bg-gray-100 rounded-lg text-gray-800 flex items-center gap-4 transition-all cursor-pointer hover:bg-gray-200";
@@ -249,7 +254,7 @@ function createSidebarCard(emp) {
     workersContainer.appendChild(card);
 }
 
-
+// ///affichage dans les card dans les zones//////
 function createZoneCard(emp) {
     let card = document.createElement('div');
     card.className = "relative cursor-pointer max-w-[8rem] hover:scale-[1.02] transition";
@@ -285,10 +290,18 @@ function createZoneCard(emp) {
     else if (emp.zonesAsigned === "Salle Serveurs") {
         containerServeurs.appendChild(card);
     }
-    else if (emp.zonesAsigned === "Salle Securite") containerSecurite.appendChild(card);
-    else if (emp.zonesAsigned === "Salle Personnel") containerPersonnel.appendChild(card);
-    else if (emp.zonesAsigned === "Salle d'Archives") containerArchives.appendChild(card);
-    else if (emp.zonesAsigned === "Salle de Conference") containerConference.appendChild(card);
+    else if (emp.zonesAsigned === "Salle Securite"){
+         containerSecurite.appendChild(card);
+    }
+    else if (emp.zonesAsigned === "Salle Personnel"){
+         containerPersonnel.appendChild(card);
+    }
+    else if (emp.zonesAsigned === "Salle d'Archives"){
+         containerArchives.appendChild(card);
+    }
+    else if (emp.zonesAsigned === "Salle de Conference"){
+         containerConference.appendChild(card);
+    }
 }
 
 
