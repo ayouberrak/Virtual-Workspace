@@ -210,8 +210,11 @@ function refreshUI() {
     containerConference.innerHTML = "";
 
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
+    console.log(employes);
+    
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     const filterRole = filterSelect ? filterSelect.value : 'all';
+
 
     employes.forEach(emp => {
         const matchesSearch = emp.fullname.toLowerCase().includes(searchTerm) || emp.role.toLowerCase().includes(searchTerm);
@@ -224,10 +227,12 @@ function refreshUI() {
         } else {
             createZoneCard(emp);
         }
+        console.log(emp);
     });
 }
 
 function createSidebarCard(emp) {
+    console.log(emp)
     let card = document.createElement('div');
     card.className = "cursor-pointer p-2 bg-gray-100 rounded-lg text-gray-800 flex items-center gap-4 transition-all cursor-pointer hover:bg-gray-200";
 
