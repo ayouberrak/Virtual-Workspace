@@ -1,11 +1,12 @@
-let btnAdd = document.getElementById('btn-add'); 
+// /// variable globales/////
+let btnAdd = document.getElementById('btn-add');
 let formulaire = document.getElementById('model-form');
-let cancelBtn = document.getElementById('cancel-btn'); 
-let photoInput = document.getElementById('Photo'); 
-let photoPreview = document.getElementById('photoPreview'); 
+let cancelBtn = document.getElementById('cancel-btn');
+let photoInput = document.getElementById('Photo');
+let photoPreview = document.getElementById('photoPreview');
 let btnAddExperiences = document.getElementById('btn-Add-Experiences');
 let experiencesContainer = document.getElementById('experiances-contairer');
-let form = document.getElementById('formulaire'); 
+let form = document.getElementById('formulaire');
 let workersContainer = document.getElementById('workers-container');
 
 const modalContainer = document.getElementById('modal-container');
@@ -28,13 +29,14 @@ const btnpersonnel = document.getElementById('btn-salle-personnel');
 const btnarchives = document.getElementById('btn-salle-darchives');
 const btnconference = document.getElementById('btn-salle-conference');
 
-const searchInput = document.getElementById('search-worker'); 
+const searchInput = document.getElementById('search-worker');
 const filterSelect = document.getElementById('filter-role');
 
 const tempAlert = document.getElementById('temp-alert');
 
-const MAX_WORKERS_PER_ZONE = 5; 
+const MAX_WORKERS_ZONE = 5;
 
+///// roles par zones /////
 let roleInReceprion = ["Receptionnistes", "Manager", "Nettoyage"];
 let roleInServeurs = ["Techniciens IT", "Manager", "Nettoyage"];
 let roleInSecurite = ["Agents de securite", "Manager", "Nettoyage"];
@@ -42,7 +44,9 @@ let roleInPersonnel = ["Agents de securite", "Manager", "Nettoyage", "Autres rol
 let roleInArchives = ["Manager"];
 let roleInConference = ["Agents de securite", "Manager", "Nettoyage", "Autres roles", "Techniciens IT", "Receptionnistes"];
 
-///// alert for the timer ////
+
+
+// /// alert message /////
 function showTempAlert(message, duration = 3000) {
         if (tempAlert.timeout) {
             clearTimeout(tempAlert.timeout);
@@ -59,7 +63,8 @@ function showTempAlert(message, duration = 3000) {
         }, 300);
     }, duration);
 }
-//////// for colse and open form /////
+
+///// close and open modal
 btnAdd.addEventListener('click', () => {
     formulaire.classList.remove('hidden');
 });
@@ -71,7 +76,8 @@ cancelBtn.addEventListener('click', () => {
 closeModalBtn.addEventListener('click', () => {
     modalContainer.style.display = 'none';
 });
-/////// photo preview ///////
+
+///// image preview/////
 photoInput.addEventListener('input', (e) => {
     photoPreview.innerHTML = '';
     let img = document.createElement('img');
@@ -82,14 +88,15 @@ photoInput.addEventListener('input', (e) => {
     img.src = e.target.value;
     photoPreview.appendChild(img);
 });
-
 //// serach call /////
+
 if (searchInput && filterSelect) {
     searchInput.addEventListener('input', () => refreshUI());
     filterSelect.addEventListener('change', () => refreshUI());
 }
 
-///error validation //
+
+/////// error rejex//////
 function displayError(inputElement, message, condition) {
     const previousError = inputElement.nextElementSibling;
     if (previousError && previousError.classList.contains('error-message')) {
@@ -110,11 +117,12 @@ function displayError(inputElement, message, condition) {
         return true;
     }
 }
-
+////// model submit///////
 form.addEventListener('submit', function (e) {
     e.preventDefault();
 
     //// rejex validation ////
+
     const nameRegEx = /^[a-zA-Z\s\u00C0-\u00FF'-]{2,}$/;
     const emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const phoneRegEx = /^\+?(\d[\d\s-]{8,}\d)$/;
@@ -131,7 +139,8 @@ form.addEventListener('submit', function (e) {
     let isExperienceValid = true;
     let experiences = [];
 
-    ///// entreprise validation ////
+
+    ////// experiance add ////
     document.querySelectorAll('#experiances-contairer > div').forEach(div => {
         let entInput = div.querySelector('input[name="Entreprise"]');
         let dFrom = div.querySelector('input[name="DateFrom"]').value;
@@ -150,11 +159,14 @@ form.addEventListener('submit', function (e) {
         }
     });
 
+
+    ///// spot submit //////
     if (!(isNameValid && isEmailValid && isPhoneValid && isExperienceValid)) {
         return;
     }
 
-    //// stoker les info de worker
+
+    //// add new worker ////
     let name = nameInput.value;
     let position = document.getElementById('role').value;
     let image = document.getElementById('Photo').value;
@@ -181,7 +193,7 @@ form.addEventListener('submit', function (e) {
     employes.push(worker);
     localStorage.setItem('employe', JSON.stringify(employes));
 
-    //// reset formulaire et fermeture du modal////
+    //// reset formulaire et close du modal////
     form.reset();
     photoPreview.innerHTML = `<img src="./public/images/default-Photo.jpg" alt="default-Photo" class="w-full h-full object-cover">`;
     experiencesContainer.innerHTML = '';
@@ -191,7 +203,7 @@ form.addEventListener('submit', function (e) {
     refreshUI();
 });
 
-////// experinace add ////
+///// btn for add experiances //////
 btnAddExperiences.addEventListener('click', () => {
     let div = document.createElement('div');
     div.className = 'mt-4 p-2 rounded-lg bg-gray-50';
@@ -221,9 +233,25 @@ function refreshUI() {
     containerConference.innerHTML = "";
 
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const filterRole = filterSelect ? filterSelect.value : 'all';
+    console.log(employes);
 
+    let searchTerm = "";
+    let filterRole = "all";
+
+    if (searchInput) {
+        searchTerm = searchInput.value.toLowerCase();
+    } else {
+        searchTerm = "";
+    }
+    
+    if (filterSelect) {
+        filterRole = filterSelect.value;
+    } else {
+        filterRole = "all";
+    }
+
+
+    ///// filter ana zone is null /////
     employes.forEach(emp => {
         const matchesSearch = emp.fullname.toLowerCase().includes(searchTerm) || emp.role.toLowerCase().includes(searchTerm);
         const matchesRole = filterRole === 'all' || emp.role === filterRole;
@@ -235,13 +263,25 @@ function refreshUI() {
         } else {
             createZoneCard(emp);
         }
+        // console.log(emp);
     });
+
+    ///// red zones /////
+    redZones(employes, 'Salle Serveurs', document.getElementById('big-container-serveurs'))
+    redZones(employes, 'Salle Securite', document.getElementById('big-container-securite'))
+    redZones(employes, 'Reception', document.getElementById('big-container-reception'))
+    redZones(employes, 'Salle d\'Archives', document.getElementById('big-container-archives'))
+
 }
 
 // /// afichager des card dans sidbar ////
+
 function createSidebarCard(emp) {
+    // console.log(emp)
     let card = document.createElement('div');
-    card.className = "cursor-pointer p-2 bg-gray-100 rounded-lg text-gray-800 flex items-center gap-4 transition-all cursor-pointer hover:bg-gray-200";
+    card.className = "cursor-pointer px-8 py-2 bg-gray-100 rounded-lg text-gray-800 flex items-center justify-between transition-all cursor-pointer hover:bg-gray-200";
+    card.dataset.id = emp.id;
+    // console.log(emp.id)
 
     card.innerHTML = `
         <img src="${emp.photo}" class="w-10 h-10 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
@@ -249,62 +289,109 @@ function createSidebarCard(emp) {
             <p class="font-bold text-sm">${emp.fullname}</p>
             <p class="text-gray-500 text-xs">${emp.role}</p>
         </div>
+        <div class='deleteWorker'>
+            <i class="fas fa-trash text-red-600 hover:text-red-800 cursor-pointer"></i>
+        </div>
     `;
-    card.addEventListener('click', () => afichierInfoWorker(emp)); 
+
+    /////// delete call///// 
+    card.querySelector('.deleteWorker').addEventListener('click', e => {
+        e.stopPropagation();
+        if (confirm('vouler vous suprimer le worker ??')) {
+            deleteEmployee(emp.id);
+        }
+
+    });
+    card.addEventListener('click', () => {
+        afichierInfoWorker(emp)
+    });
     workersContainer.appendChild(card);
 }
+// //// delete logique /////
+function deleteEmployee(id) {
+    let employes = JSON.parse(localStorage.getItem('employe')) || [];
 
-// ///affichage dans les card dans les zones//////
+
+    const initialLength = employes.length;
+    employes = employes.filter(emp => emp.id !== id);
+
+    if (employes.length < initialLength) {
+        localStorage.setItem('employe', JSON.stringify(employes));
+        showTempAlert('Employe Supprime avec Succes!');
+        refreshUI();
+    }
+}
+//////card in zone/////
+
 function createZoneCard(emp) {
+    // console.log(emp);
+
     let card = document.createElement('div');
-    card.className = "relative cursor-pointer max-w-[8rem] hover:scale-[1.02] transition";
+    card.className = "relative cursor-pointer max-w-[10rem] hover:scale-[1.02] transition";
+    card.dataset.id = emp.id
+    // console.log(emp.id);
+    
 
     card.innerHTML = `
-        <div class="relative flex items-center gap-2 p-1 bg-white/90 rounded-lg shadow-md ">
-            <img src="${emp.photo}"
+
+        <div class="hidden md:flex relative items-center gap-2 p-1 bg-white/90 rounded-lg w-auto"  >
+            <img src="${emp.photo}" 
                 class="h-8 w-8 rounded-full object-cover "
                 onerror="this.src='./public/images/default-Photo.jpg'">
 
             <div class='flex-1'>
                 <h3 class="text-[0.6rem] font-bold text-gray-800 truncate">${emp.fullname}</h3>
-                <h3 class="text-[0.55rem] text-gray-600 truncate">${emp.role}</h3>
+                <h3 class="text-[0.55rem] text-gray-600 ">${emp.role}</h3>
             </div>
 
-            <button class="delete-btn absolute top-[-5px] right-[-5px] bg-red-600 p-1 rounded-full text-white shadow-lg hover:bg-red-500 transition">
-                <i class="fa-solid fa-xmark text-xs"></i>
+            <button class="delete-btn">
+                 <i class="fas fa-trash text-red-600 hover:text-red-800 cursor-pointer"></i>
+            </button>
+        </div>
+        <div class="flex md:hidden bg-white/90 rounded-sm"  >
+            <img src="${emp.photo}" 
+                class="h-6 w-6 rounded-full object-cover "
+                onerror="this.src='./public/images/default-Photo.jpg'">
+
+            <div class='flex-1'>
+                <h3 class="text-[0.4rem] font-bold text-gray-800 ">${emp.fullname}</h3>
+                <h3 class="text-[0.4rem] text-gray-600 ">${emp.role}</h3>
+            </div>
+
+            <button class="delete-btn text-[0.7rem]">
+                 <i class="fas fa-trash text-red-600 hover:text-red-800 cursor-pointer"></i>
             </button>
         </div>
     `;
 
-    card.addEventListener('click', () => afichierInfoWorker(emp));
+    card.addEventListener('click', () => {
+        afichierInfoWorker(emp)
+    });
 
     card.querySelector('.delete-btn').addEventListener('click', (e) => {
-        e.stopPropagation(); 
+        e.stopPropagation();
         updateEmployeeZone(emp.id, null);
         showTempAlert(`Employe ${emp.fullname} a ete desassigne.`);
     });
 
+
+    // //zones if ...//
     if (emp.zonesAsigned === "Reception") {
         containerReception.appendChild(card);
-    }
-    else if (emp.zonesAsigned === "Salle Serveurs") {
+    } else if (emp.zonesAsigned === "Salle Serveurs") {
         containerServeurs.appendChild(card);
-    }
-    else if (emp.zonesAsigned === "Salle Securite"){
-         containerSecurite.appendChild(card);
-    }
-    else if (emp.zonesAsigned === "Salle Personnel"){
-         containerPersonnel.appendChild(card);
-    }
-    else if (emp.zonesAsigned === "Salle d'Archives"){
-         containerArchives.appendChild(card);
-    }
-    else if (emp.zonesAsigned === "Salle de Conference"){
-         containerConference.appendChild(card);
+    } else if (emp.zonesAsigned === "Salle Securite") {
+        containerSecurite.appendChild(card);
+    } else if (emp.zonesAsigned === "Salle Personnel") {
+        containerPersonnel.appendChild(card);
+    } else if (emp.zonesAsigned === "Salle d'Archives") {
+        containerArchives.appendChild(card); 
+    } else if (emp.zonesAsigned === "Salle de Conference") {
+        containerConference.appendChild(card);
     }
 }
 
-
+// /// zones worker///
 function updateEmployeeZone(id, newZone) {
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
     for (let i = 0; i < employes.length; i++) {
@@ -318,6 +405,7 @@ function updateEmployeeZone(id, newZone) {
 }
 
 
+/// roles and zones afecter/////
 function setupZoneButton(btn, rolesAllowed, zoneName) {
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -325,8 +413,9 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
         let employes = JSON.parse(localStorage.getItem('employe')) || [];
         const workersInZone = employes.filter(emp => emp.zonesAsigned === zoneName).length;
 
-        if (workersInZone >= MAX_WORKERS_PER_ZONE) {
-            showTempAlert(`Impossible d'ajouter plus d'employes a ${zoneName}. Limite maximale de ${MAX_WORKERS_PER_ZONE} employes atteinte.`, 4000);
+        // /// max/////
+        if (workersInZone >= MAX_WORKERS_ZONE) {
+            showTempAlert(`Impossible d'ajouter plus d'employes a ${zoneName}. Limite maximale de ${MAX_WORKERS_ZONE} employes atteinte.`, 4000);
             return;
         }
 
@@ -338,11 +427,13 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
         let found = false;
 
         employes.forEach(emp => {
-            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned === null) {
+            // /// roles in table for zones ///
+            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned !== zoneName) {
                 found = true;
                 let div = document.createElement('div');
                 div.className = "flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 transition rounded-lg";
 
+                ///// model demployee true ////
                 div.innerHTML = `
                     <img src="${emp.photo}"
                         class="w-10 h-10 rounded-full object-cover "
@@ -353,9 +444,14 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
                         <p class="text-blue-600 text-xs">${emp.role}</p>
                     </div>
                 `;
+                //// worker add ///
                 div.addEventListener('click', () => {
+                    if (emp.zonesAsigned && emp.zonesAsigned !== zoneName) {
+                        if (!confirm(`Voulez-vous le transférer vers ${zoneName} ?`))
+                            return;
+                    }
                     const workersInZoneAfterCheck = employes.filter(emp => emp.zonesAsigned === zoneName).length;
-                    if (workersInZoneAfterCheck >= MAX_WORKERS_PER_ZONE) {
+                    if (workersInZoneAfterCheck >= MAX_WORKERS_ZONE) {
                         showTempAlert(`Impossible d'ajouter plus d'employes a ${zoneName}. Limite maximale atteinte.`, 4000);
                         modalContainer.style.display = 'none';
                         return;
@@ -363,16 +459,19 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
 
                     updateEmployeeZone(emp.id, zoneName);
                     showTempAlert(`Employe ${emp.fullname} assigne a ${zoneName}.`, 3000);
-                    modalContainer.style.display = 'none'; 
+                    modalContainer.style.display = 'none';
                 });
                 employeesList.appendChild(div);
             }
         });
 
-        if (!found) noRoleMessage.style.display = 'block'; 
+        // //// aucun////
+        if (!found) {
+            noRoleMessage.style.display = 'block';
+        }
     });
 }
-
+// ///calll///
 setupZoneButton(btnreception, roleInReceprion, "Reception");
 setupZoneButton(btnserveurs, roleInServeurs, "Salle Serveurs");
 setupZoneButton(btnsecurite, roleInSecurite, "Salle Securite");
@@ -380,7 +479,7 @@ setupZoneButton(btnpersonnel, roleInPersonnel, "Salle Personnel");
 setupZoneButton(btnarchives, roleInArchives, "Salle d'Archives");
 setupZoneButton(btnconference, roleInConference, "Salle de Conference");
 
-
+// //// info de worker////
 function afichierInfoWorker(newwoker) {
     let divInfo = document.createElement('div');
     divInfo.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4';
@@ -404,7 +503,7 @@ function afichierInfoWorker(newwoker) {
     ` : '';
 
     let modalContent = `
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative text-gray-900 shadow-xl border border-gray-300">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative text-gray-900 ">
 
             <button id="close-info-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition">
                 <i class="fa-solid fa-xmark text-2xl"></i>
@@ -446,4 +545,19 @@ function afichierInfoWorker(newwoker) {
     document.body.appendChild(divInfo);
 }
 
+///// red zones////
+function redZones(employes, zoneName, containerElement) {
+    let isAssigned = employes.some(e => e.zonesAsigned === zoneName);
+
+    if (isAssigned) {
+        containerElement.classList.remove('bg-red-900/40', 'hover:bg-red-500/50');
+        containerElement.classList.add('bg-gray-900/40', 'hover:bg-green-500/50');
+    } else {
+        containerElement.classList.remove('bg-gray-900/40', 'hover:bg-green-500/50');
+        containerElement.classList.add('bg-red-900/40', 'hover:bg-red-500/50');
+    }
+}
+
+
+///init////
 refreshUI();
