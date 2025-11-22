@@ -242,6 +242,9 @@ function createSidebarCard(emp) {
             <p class="font-bold text-sm">${emp.fullname}</p>
             <p class="text-gray-500 text-xs">${emp.role}</p>
         </div>
+        <div>
+            <h2>delete</h2>
+        </div>
     `;
     card.addEventListener('click', () => afichierInfoWorker(emp));
     workersContainer.appendChild(card);
@@ -250,9 +253,12 @@ function createSidebarCard(emp) {
 function createZoneCard(emp) {
     let card = document.createElement('div');
     card.className = "relative cursor-pointer max-w-[8rem] hover:scale-[1.02] transition";
+    card.dataset.id=emp.id
+    console.log(emp);
+    
 
     card.innerHTML = `
-        <div class="relative flex items-center gap-2 p-1 bg-white/90 rounded-lg shadow-md ">
+        <div class="relative flex items-center gap-2 p-1 bg-white/90 rounded-lg shadow-md" >
             <img src="${emp.photo}" 
                 class="h-8 w-8 rounded-full object-cover "
                 onerror="this.src='./public/images/default-Photo.jpg'">
@@ -320,7 +326,7 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
         let found = false;
 
         employes.forEach(emp => {
-            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned === null) {
+            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned !== zoneName){
                 found = true;
                 let div = document.createElement('div');
                 div.className = "flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 transition rounded-lg";
