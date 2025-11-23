@@ -281,6 +281,7 @@ function createSidebarCard(emp) {
     let card = document.createElement('div');
     card.className = "cursor-pointer px-8 py-2 bg-gray-100 rounded-lg text-gray-800 flex items-center justify-between transition-all cursor-pointer hover:bg-gray-200";
     card.dataset.id = emp.id;
+    card.id = 'worker'
     // console.log(emp.id)
 
     card.innerHTML = `
