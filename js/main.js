@@ -1,12 +1,12 @@
 // /// variable globales/////
 let btnAdd = document.getElementById('btn-add');
-let formulaire = document.getElementById('model-form');
+let formulaireModal = document.getElementById('model-form');
 let cancelBtn = document.getElementById('cancel-btn');
 let photoInput = document.getElementById('Photo');
-let photoPreview = document.getElementById('photoPreview');
+let photoPreviewDiv = document.getElementById('photoPreview');
 let btnAddExperiences = document.getElementById('btn-Add-Experiences');
 let experiencesContainer = document.getElementById('experiances-contairer');
-let form = document.getElementById('formulaire');
+let theForm = document.getElementById('formulaire');
 let workersContainer = document.getElementById('workers-container');
 
 const modalContainer = document.getElementById('modal-container');
@@ -47,12 +47,12 @@ let roleInConference = ["Agents de securite", "Manager", "Nettoyage", "Autres ro
 
 
 // /// alert message /////
-function showTempAlert(message, duration = 3000) {
-        if (tempAlert.timeout) {
-            clearTimeout(tempAlert.timeout);
-        }
+function afficherAlerteRapide(msg, dur = 3000) {
+    if (tempAlert.timeout) {
+        clearTimeout(tempAlert.timeout);
+    }
 
-    tempAlert.innerText = message;
+    tempAlert.innerText = msg;
     tempAlert.classList.remove('hidden');
     tempAlert.style.opacity = '1';
 
@@ -61,16 +61,16 @@ function showTempAlert(message, duration = 3000) {
         setTimeout(() => {
             tempAlert.classList.add('hidden');
         }, 300);
-    }, duration);
+    }, dur);
 }
 
 ///// close and open modal
 btnAdd.addEventListener('click', () => {
-    formulaire.classList.remove('hidden');
+    formulaireModal.classList.remove('hidden');
 });
 
 cancelBtn.addEventListener('click', () => {
-    formulaire.classList.add('hidden');
+    formulaireModal.classList.add('hidden');
 });
 
 closeModalBtn.addEventListener('click', () => {
@@ -79,62 +79,68 @@ closeModalBtn.addEventListener('click', () => {
 
 ///// image preview/////
 photoInput.addEventListener('input', (e) => {
-    photoPreview.innerHTML = '';
+    photoPreviewDiv.innerHTML = '';
     let img = document.createElement('img');
     img.className = 'w-full h-full object-cover';
     img.onerror = () => {
         img.src = './public/images/default-Photo.jpg';
     };
     img.src = e.target.value;
-    photoPreview.appendChild(img);
+    photoPreviewDiv.appendChild(img);
 });
 //// serach call /////
 
 if (searchInput && filterSelect) {
-    searchInput.addEventListener('input', () => refreshUI());
-    filterSelect.addEventListener('change', () => refreshUI());
+    searchInput.addEventListener('input', () => {
+        updateInterface()
+    });
+    filterSelect.addEventListener('change', () => {
+        updateInterface()
+    });
 }
 
 
 /////// error rejex//////
-function displayError(inputElement, message, condition) {
-    const previousError = inputElement.nextElementSibling;
+function montrerErreurValidation(inp, msg, check) {
+    const previousError = inp.nextElementSibling;
     if (previousError && previousError.classList.contains('error-message')) {
         previousError.remove();
     }
 
-    if (!condition) {
+    if (!check) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message text-red-500 text-xs mt-1';
-        errorDiv.textContent = message;
+        errorDiv.textContent = msg;
 
-        inputElement.parentNode.insertBefore(errorDiv, inputElement.nextSibling);
+        inp.parentNode.insertBefore(errorDiv, inp.nextSibling);
 
-        inputElement.classList.add('border-red-500');
+        inp.classList.add('border-red-500');
         return false;
     } else {
-        inputElement.classList.remove('border-red-500');
+        inp.classList.remove('border-red-500');
         return true;
     }
 }
 ////// model submit///////
-form.addEventListener('submit', function (e) {
+theForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
     //// rejex validation ////
 
-    const nameRegEx = /^[a-zA-Z\s\u00C0-\u00FF'-]{2,}$/;
-    const emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const phoneRegEx = /^\+?(\d[\d\s-]{8,}\d)$/;
-    const entrepriseRegEx = /^[a-zA-Z0-9\s.,'-]{2,}$/;
+    const nameRegEx = /^[a-zA-Z\s]{2,}$/;
+    const emailRegEx = /^[\w\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const phoneRegEx = /^(06|07)\d{8}$/;
+    const entrepriseRegEx = /^[a-zA-Z0-9\s.']{2,}$/;
 
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
 
-    const isNameValid = displayError(nameInput, ' Minimum 2 caracteres', nameRegEx.test(nameInput.value));
-    const isEmailValid = displayError(emailInput, ' Format d email invalide', emailRegEx.test(emailInput.value));
-    const isPhoneValid = displayError(phoneInput, ' Numero de telephone invalide.', phoneRegEx.test(phoneInput.value));
+    const isNameValid = montrerErreurValidation(nameInput, ' Minimum 2 caracteres', nameRegEx.test(nameInput.value));
+    const isEmailValid = montrerErreurValidation(emailInput, ' Format d email invalide', emailRegEx.test(emailInput.value));
+    const isPhoneValid = montrerErreurValidation(phoneInput, ' Numero de telephone invalide.', phoneRegEx.test(phoneInput.value));
+
+
 
     let isExperienceValid = true;
     let experiences = [];
@@ -142,26 +148,29 @@ form.addEventListener('submit', function (e) {
 
     ////// experiance add ////
     document.querySelectorAll('#experiances-contairer > div').forEach(div => {
-        let entInput = div.querySelector('input[name="Entreprise"]');
+        let entInput = div.querySelector('input[name="Entreprise"]').value;
         let dFrom = div.querySelector('input[name="DateFrom"]').value;
         let dTo = div.querySelector('input[name="DateTo"]').value;
-        let ent = entInput.value;
 
-        if (ent && !entrepriseRegEx.test(ent)) {
-            displayError(entInput, ' Nom de l entreprise invalide.', entrepriseRegEx.test(ent));
+        if (entInput && !entrepriseRegEx.test(entInput)) {
+            montrerErreurValidation(entInput, ' Nom de l entreprise invalide.', entrepriseRegEx.test(entInput));
             isExperienceValid = false;
-        } else if (ent) {
-            displayError(entInput, '', true);
+        } else if (entInput) {
+            montrerErreurValidation(entInput, '', true);
         }
 
-        if (ent && dFrom && dTo) {
-            experiences.push({ entreprise: ent, dateFrom: dFrom, dateTo: dTo });
+        if (entInput && dFrom && dTo) {
+            experiences.push({
+                entreprise: entInput,
+                dateFrom: dFrom,
+                dateTo: dTo
+            });
         }
     });
 
 
     ///// spot submit //////
-    if (!(isNameValid && isEmailValid && isPhoneValid && isExperienceValid)) {
+    if (!isNameValid && !isEmailValid && !isPhoneValid && !isExperienceValid) {
         return;
     }
 
@@ -170,14 +179,14 @@ form.addEventListener('submit', function (e) {
     let name = nameInput.value;
     let position = document.getElementById('role').value;
     let image = document.getElementById('Photo').value;
-    if (!image){
-         image = './public/images/default-Photo.jpg'
+    if (!image) {
+        image = './public/images/default-Photo.jpg'
     };
 
     let email = emailInput.value;
     let phone = phoneInput.value;
 
-    let worker = {
+    let newWorker = {
         id: Date.now(),
         fullname: name,
         role: position,
@@ -185,22 +194,22 @@ form.addEventListener('submit', function (e) {
         email: email,
         phone: phone,
         experiences: experiences,
-        zonesAsigned: null 
+        zonesAsigned: null
     };
 
     //// localStorage//
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
-    employes.push(worker);
+    employes.push(newWorker);
     localStorage.setItem('employe', JSON.stringify(employes));
 
     //// reset formulaire et close du modal////
-    form.reset();
-    photoPreview.innerHTML = `<img src="./public/images/default-Photo.jpg" alt="default-Photo" class="w-full h-full object-cover">`;
+    theForm.reset();
+    photoPreviewDiv.innerHTML = `<img src="./public/images/default-Photo.jpg" alt="default-Photo" class="w-full h-full object-cover">`;
     experiencesContainer.innerHTML = '';
 
-    formulaire.classList.add('hidden');
-    showTempAlert('Employe Ajoute avec Succes!');
-    refreshUI();
+    formulaireModal.classList.add('hidden');
+    afficherAlerteRapide('Employe Ajoute avec Succes!');
+    updateInterface();
 });
 
 ///// btn for add experiances //////
@@ -219,11 +228,13 @@ btnAddExperiences.addEventListener('click', () => {
             <input type="date" name="DateTo" class="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg ">
         </div>
     `;
-    div.querySelector('.delete-exp').addEventListener('click', () => div.remove());
+    div.querySelector('.delete-exp').addEventListener('click', () => {
+        div.remove()
+    });
     experiencesContainer.appendChild(div);
 });
 // ///// afichage des card dans les zones //////
-function refreshUI() {
+function updateInterface() {
     workersContainer.innerHTML = "";
     containerReception.innerHTML = "";
     containerServeurs.innerHTML = "";
@@ -233,7 +244,7 @@ function refreshUI() {
     containerConference.innerHTML = "";
 
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
-    console.log(employes);
+    // console.log(employes);
 
     let searchTerm = "";
     let filterRole = "all";
@@ -243,7 +254,7 @@ function refreshUI() {
     } else {
         searchTerm = "";
     }
-    
+
     if (filterSelect) {
         filterRole = filterSelect.value;
     } else {
@@ -258,25 +269,28 @@ function refreshUI() {
 
         if (emp.zonesAsigned === null) {
             if (matchesSearch && matchesRole) {
-                createSidebarCard(emp);
+                makeSidebarCard(emp);
             }
         } else {
-            createZoneCard(emp);
+            makeZoneCard(emp);
         }
         // console.log(emp);
     });
 
     ///// red zones /////
-    redZones(employes, 'Salle Serveurs', document.getElementById('big-container-serveurs'))
-    redZones(employes, 'Salle Securite', document.getElementById('big-container-securite'))
-    redZones(employes, 'Reception', document.getElementById('big-container-reception'))
-    redZones(employes, 'Salle d\'Archives', document.getElementById('big-container-archives'))
+    checkZoneStatus(employes, 'Salle Serveurs', document.getElementById('big-container-serveurs'))
+    checkZoneStatus(employes, 'Salle Securite', document.getElementById('big-container-securite'))
+    checkZoneStatus(employes, 'Reception', document.getElementById('big-container-reception'))
+    checkZoneStatus(employes, 'Salle d\'Archives', document.getElementById('big-container-archives'))
+    checkZoneStatus(employes, 'Salle Personnel', document.getElementById('big-container-personnel'))
+    checkZoneStatus(employes, 'Salle de Conference', document.getElementById('big-container-conference'))
+
 
 }
 
 // /// afichager des card dans sidbar ////
 
-function createSidebarCard(emp) {
+function makeSidebarCard(emp) {
     // console.log(emp)
     let card = document.createElement('div');
     card.className = "cursor-pointer px-8 py-2 bg-gray-100 rounded-lg text-gray-800 flex items-center justify-between transition-all cursor-pointer hover:bg-gray-200";
@@ -304,45 +318,45 @@ function createSidebarCard(emp) {
 
     });
     card.addEventListener('click', () => {
-        afichierInfoWorker(emp)
+        showWorkerDetails(emp)
     });
     workersContainer.appendChild(card);
 }
 // //// delete logique /////
-function deleteEmployee(id) {
+function deleteEmployee(id_wkr) {
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
 
 
     const initialLength = employes.length;
-    employes = employes.filter(emp => emp.id !== id);
+    employes = employes.filter(emp => emp.id !== id_wkr);
 
     if (employes.length < initialLength) {
         localStorage.setItem('employe', JSON.stringify(employes));
-        showTempAlert('Employe Supprime avec Succes!');
-        refreshUI();
+        afficherAlerteRapide('Employe Supprime avec Succes!');
+        updateInterface();
     }
 }
-//////card in zone/////
 
-function createZoneCard(emp) {
-    // console.log(emp);
+//////card in zone/////
+function makeZoneCard(wkr) {
+    // console.log(wkr);
 
     let card = document.createElement('div');
     card.className = "relative cursor-pointer max-w-[10rem] hover:scale-[1.02] transition";
-    card.dataset.id = emp.id
-    // console.log(emp.id);
-    
+    card.dataset.id = wkr.id
+    // console.log(wkr.id);
+
 
     card.innerHTML = `
 
         <div class="hidden md:flex relative items-center gap-2 p-1 bg-white/90 rounded-lg w-auto"  >
-            <img src="${emp.photo}" 
+            <img src="${wkr.photo}" 
                 class="h-8 w-8 rounded-full object-cover "
                 onerror="this.src='./public/images/default-Photo.jpg'">
 
             <div class='flex-1'>
-                <h3 class="text-[0.6rem] font-bold text-gray-800 truncate">${emp.fullname}</h3>
-                <h3 class="text-[0.55rem] text-gray-600 ">${emp.role}</h3>
+                <h3 class="text-[0.6rem] font-bold text-gray-800 truncate">${wkr.fullname}</h3>
+                <h3 class="text-[0.55rem] text-gray-600 ">${wkr.role}</h3>
             </div>
 
             <button class="delete-btn">
@@ -350,13 +364,13 @@ function createZoneCard(emp) {
             </button>
         </div>
         <div class="flex md:hidden bg-white/90 rounded-sm"  >
-            <img src="${emp.photo}" 
+            <img src="${wkr.photo}" 
                 class="h-6 w-6 rounded-full object-cover "
                 onerror="this.src='./public/images/default-Photo.jpg'">
 
             <div class='flex-1'>
-                <h3 class="text-[0.4rem] font-bold text-gray-800 ">${emp.fullname}</h3>
-                <h3 class="text-[0.4rem] text-gray-600 ">${emp.role}</h3>
+                <h3 class="text-[0.4rem] font-bold text-gray-800 ">${wkr.fullname}</h3>
+                <h3 class="text-[0.4rem] text-gray-600 ">${wkr.role}</h3>
             </div>
 
             <button class="delete-btn text-[0.7rem]">
@@ -366,62 +380,62 @@ function createZoneCard(emp) {
     `;
 
     card.addEventListener('click', () => {
-        afichierInfoWorker(emp)
+        showWorkerDetails(wkr)
     });
 
     card.querySelector('.delete-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        updateEmployeeZone(emp.id, null);
-        showTempAlert(`Employe ${emp.fullname} a ete desassigne.`);
+        changeEmployeeZone(wkr.id, null);
+        afficherAlerteRapide(`Employe ${wkr.fullname} a ete desassigne.`);
     });
 
 
     // //zones if ...//
-    if (emp.zonesAsigned === "Reception") {
+    if (wkr.zonesAsigned === "Reception") {
         containerReception.appendChild(card);
-    } else if (emp.zonesAsigned === "Salle Serveurs") {
+    } else if (wkr.zonesAsigned === "Salle Serveurs") {
         containerServeurs.appendChild(card);
-    } else if (emp.zonesAsigned === "Salle Securite") {
+    } else if (wkr.zonesAsigned === "Salle Securite") {
         containerSecurite.appendChild(card);
-    } else if (emp.zonesAsigned === "Salle Personnel") {
+    } else if (wkr.zonesAsigned === "Salle Personnel") {
         containerPersonnel.appendChild(card);
-    } else if (emp.zonesAsigned === "Salle d'Archives") {
-        containerArchives.appendChild(card); 
-    } else if (emp.zonesAsigned === "Salle de Conference") {
+    } else if (wkr.zonesAsigned === "Salle d'Archives") {
+        containerArchives.appendChild(card);
+    } else if (wkr.zonesAsigned === "Salle de Conference") {
         containerConference.appendChild(card);
     }
 }
 
 // /// zones worker///
-function updateEmployeeZone(id, newZone) {
+function changeEmployeeZone(id, zoneName) {
     let employes = JSON.parse(localStorage.getItem('employe')) || [];
     for (let i = 0; i < employes.length; i++) {
         if (employes[i].id === id) {
-            employes[i].zonesAsigned = newZone;
+            employes[i].zonesAsigned = zoneName;
             break;
         }
     }
     localStorage.setItem('employe', JSON.stringify(employes));
-    refreshUI();
+    updateInterface();
 }
 
 
 /// roles and zones afecter/////
-function setupZoneButton(btn, rolesAllowed, zoneName) {
+function setupZoneButton(btn, roles, zone) {
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
 
         let employes = JSON.parse(localStorage.getItem('employe')) || [];
-        const workersInZone = employes.filter(emp => emp.zonesAsigned === zoneName).length;
+        const workersInZone = employes.filter(emp => emp.zonesAsigned === zone).length;
 
         // /// max/////
         if (workersInZone >= MAX_WORKERS_ZONE) {
-            showTempAlert(`Impossible d'ajouter plus d'employes a ${zoneName}. Limite maximale de ${MAX_WORKERS_ZONE} employes atteinte.`, 4000);
+            afficherAlerteRapide(`Impossible d'ajouter plus d'employes a ${zone}. Limite maximale de ${MAX_WORKERS_ZONE} employes atteinte.`, 4000);
             return;
         }
 
         modalContainer.style.display = 'flex';
-        modalTitle.innerText = "Ajouter a : " + zoneName;
+        modalTitle.innerText = "Ajouter a : " + zone;
         employeesList.innerHTML = "";
         noRoleMessage.style.display = 'none';
 
@@ -429,7 +443,7 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
 
         employes.forEach(emp => {
             // /// roles in table for zones ///
-            if (rolesAllowed.includes(emp.role) && emp.zonesAsigned !== zoneName) {
+            if (roles.includes(emp.role) && emp.zonesAsigned !== zone) {
                 found = true;
                 let div = document.createElement('div');
                 div.className = "flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 transition rounded-lg";
@@ -447,19 +461,12 @@ function setupZoneButton(btn, rolesAllowed, zoneName) {
                 `;
                 //// worker add ///
                 div.addEventListener('click', () => {
-                    if (emp.zonesAsigned && emp.zonesAsigned !== zoneName) {
-                        if (!confirm(`Voulez-vous le transférer vers ${zoneName} ?`))
+                    if (emp.zonesAsigned && emp.zonesAsigned !== zone) {
+                        if (!confirm(`Voulez-vous le transférer vers ${zone} ?`))
                             return;
                     }
-                    const workersInZoneAfterCheck = employes.filter(emp => emp.zonesAsigned === zoneName).length;
-                    if (workersInZoneAfterCheck >= MAX_WORKERS_ZONE) {
-                        showTempAlert(`Impossible d'ajouter plus d'employes a ${zoneName}. Limite maximale atteinte.`, 4000);
-                        modalContainer.style.display = 'none';
-                        return;
-                    }
-
-                    updateEmployeeZone(emp.id, zoneName);
-                    showTempAlert(`Employe ${emp.fullname} assigne a ${zoneName}.`, 3000);
+                    changeEmployeeZone(emp.id, zone);
+                    afficherAlerteRapide(`Employe ${emp.fullname} assigne a ${zone}.`, 3000);
                     modalContainer.style.display = 'none';
                 });
                 employeesList.appendChild(div);
@@ -481,27 +488,38 @@ setupZoneButton(btnarchives, roleInArchives, "Salle d'Archives");
 setupZoneButton(btnconference, roleInConference, "Salle de Conference");
 
 // //// info de worker////
-function afichierInfoWorker(newwoker) {
+function showWorkerDetails(wkrDet) {
     let divInfo = document.createElement('div');
     divInfo.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4';
 
-    let expListItems = newwoker.experiences && newwoker.experiences.length > 0
-        ? newwoker.experiences.map(e => `
-            <li class="mb-3 p-3 bg-gray-50 rounded-lg shadow-sm hover:bg-blue-50 transition">
-                <div class="text-sm text-gray-500 mb-1">${e.dateFrom} <span class="mx-1"> A </span> ${e.dateTo}</div>
-                <div class="font-semibold text-gray-900 uppercase">${e.entreprise}</div>
-            </li>
-          `).join('')
-        : `<li class="text-gray-500 italic text-sm p-2">Aucune experience enregistree.</li>`;
+    let expListItems = '';
 
-    let zoneInfo = newwoker.zonesAsigned ? `
-        <div class="mb-4 p-3 rounded-lg shadow-sm">
+    if (wkrDet.experiences && wkrDet.experiences.length > 0) {
+        expListItems = wkrDet.experiences.map(e => `
+        <li class="mb-3 p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition">
+            <div class="text-sm text-gray-500 mb-1">${e.dateFrom} <span class="mx-1"> A </span> ${e.dateTo}</div>
+            <div class="font-semibold text-gray-900 uppercase">${e.entreprise}</div>
+        </li>
+    `).join('');
+    } else {
+        expListItems = `<li class="text-gray-500 italic text-sm p-2">Aucun experience </li>`;
+    }
+
+    let zoneInfo = '';
+
+    if (wkrDet.zonesAsigned) {
+        zoneInfo = `
+        <div class="mb-4 p-3 rounded-lg ">
             <p>
                 <span class="text-blue-600 text-xs font-semibold">ZONE ASSIGNEE:</span>
-                <span class="font-bold text-gray-900 text-lg block">${newwoker.zonesAsigned}</span>
+                <span class="font-bold text-gray-900 text-lg block">${wkrDet.zonesAsigned}</span>
             </p>
         </div>
-    ` : '';
+    `;
+    } else {
+        zoneInfo = '';
+    }
+
 
     let modalContent = `
         <div class="bg-white rounded-2xl w-full max-w-md p-6 relative text-gray-900 ">
@@ -511,21 +529,19 @@ function afichierInfoWorker(newwoker) {
             </button>
 
             <div class="flex gap-4 items-center mb-6 ">
-                <img src="${newwoker.photo}" class="w-20 h-20 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
+                <img src="${wkrDet.photo}" class="w-20 h-20 rounded-full object-cover" onerror="this.src='./public/images/default-Photo.jpg'">
                 <div>
-                    <h2 class="text-xl font-bold">${newwoker.fullname}</h2>
-                    <p class="text-blue-500 font-semibold">${newwoker.role}</p>
+                    <h2 class="text-xl font-bold">${wkrDet.fullname}</h2>
+                    <p class="text-blue-500 font-semibold">${wkrDet.role}</p>
                 </div>
             </div>
-
             ${zoneInfo}
-
             <div id="contact-info" class="mb-4 p-3 rounded-lg">
-                <p class="mb-1"><span class="text-gray-500 text-xs font-semibold">EMAIL:</span> ${newwoker.email}</p>
-                <p><span class="text-gray-500 text-xs font-semibold">TEL:</span> ${newwoker.phone}</p>
+                <p class="mb-1"><span class="text-gray-500 text-xs font-semibold">email:</span> ${wkrDet.email}</p>
+                <p><span class="text-gray-500 text-xs font-semibold">tel:</span> ${wkrDet.phone}</p>
             </div>
 
-            <h3 class="mb-3 pb-1 font-bold text-lg">Experiences</h3>
+            <h3 class="mb-3 pb-1 font-bold text-lg">experiences</h3>
             <ul id="exp-list" class="max-h-40 overflow-y-auto pr-2 no-scrollbar">
                 ${expListItems}
             </ul>
@@ -537,7 +553,9 @@ function afichierInfoWorker(newwoker) {
     let closeModalInfoBtn = divInfo.querySelector('#close-info-modal');
 
     divInfo.addEventListener('click', (e) => {
-        if (e.target === divInfo) divInfo.remove();
+        if (e.target === divInfo) {
+            divInfo.remove()
+        };
     });
     closeModalInfoBtn.addEventListener('click', () => {
         divInfo.remove();
@@ -547,18 +565,18 @@ function afichierInfoWorker(newwoker) {
 }
 
 ///// red zones////
-function redZones(employes, zoneName, containerElement) {
-    let isAssigned = employes.some(e => e.zonesAsigned === zoneName);
+function checkZoneStatus(employesArr, zoneName, containerDom) {
+    let isAssigned = employesArr.some(e => e.zonesAsigned === zoneName);
 
     if (isAssigned) {
-        containerElement.classList.remove('bg-red-900/40', 'hover:bg-red-500/50');
-        containerElement.classList.add('bg-gray-900/40', 'hover:bg-green-500/50');
+        containerDom.classList.remove('bg-red-900/40', 'hover:bg-red-500/50');
+        containerDom.classList.add('bg-gray-900/40', 'hover:bg-green-500/50');
     } else {
-        containerElement.classList.remove('bg-gray-900/40', 'hover:bg-green-500/50');
-        containerElement.classList.add('bg-red-900/40', 'hover:bg-red-500/50');
+        containerDom.classList.remove('bg-gray-900/40', 'hover:bg-green-500/50');
+        containerDom.classList.add('bg-red-900/40', 'hover:bg-red-500/50');
     }
 }
 
 
 ///init////
-refreshUI();
+updateInterface();
