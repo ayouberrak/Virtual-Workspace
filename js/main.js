@@ -148,20 +148,22 @@ theForm.addEventListener('submit', function (e) {
 
     ////// experiance add ////
     document.querySelectorAll('#experiances-contairer > div').forEach(div => {
-        let entInput = div.querySelector('input[name="Entreprise"]').value;
+        let entInput = div.querySelector('input[name="Entreprise"]');
         let dFrom = div.querySelector('input[name="DateFrom"]').value;
         let dTo = div.querySelector('input[name="DateTo"]').value;
+        let entValue = entInput.value;
 
-        if (entInput && !entrepriseRegEx.test(entInput)) {
+
+        if (entValue && !entrepriseRegEx.test(entValue)) {
             montrerErreurValidation(entInput, ' Nom de l entreprise invalide.', entrepriseRegEx.test(entInput));
             isExperienceValid = false;
-        } else if (entInput) {
+        } else if (entValue) {
             montrerErreurValidation(entInput, '', true);
         }
 
-        if (entInput && dFrom && dTo) {
+        if (entValue && dFrom && dTo) {
             experiences.push({
-                entreprise: entInput,
+                entreprise: entValue,
                 dateFrom: dFrom,
                 dateTo: dTo
             });
